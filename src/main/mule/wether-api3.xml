@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="59913603-12d4-4d54-9d56-0253f5a999bf" >
+		<http:listener-connection host="0.0.0.0" port="8082" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="64e948ea-d1e6-4fca-8f74-b49795823f62" />
+	<flow name="wether-api3Flow" doc:id="2c8ea4bf-ebd0-4d65-a65a-5d988af46869" >
+		<http:listener doc:name="Listener" doc:id="64f7b2a1-968a-4ffd-937e-9d7fd8a82c15" config-ref="HTTP_Listener_config" path="/wetherreport"/>
+		<set-variable value="#[payload.city]" doc:name="city" doc:id="37d47f91-c2f5-4236-844e-dcd7b250ed09" variableName="city"/>
+		<logger level="INFO" doc:name="Logger" doc:id="53899e0f-5da9-4b6d-b791-157a29ba77fa" message=";;;;;;;;;request before logger;;;;;;;"/>
+		<http:request method="GET" doc:name="Request" doc:id="8f97ed4e-d06e-4622-b43f-99ad030c741b" config-ref="HTTP_Request_configuration" url="https://api.openweathermap.org/data/2.5/weather">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"appid" : "2323db1e0990b44970bd921083fa882c",
+	"q" : vars.city
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="30e72679-4fa9-4eb6-8df9-99fe8c75ee0e" message=";;;;request after loger;;;;#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="ecb383d8-d251-43e7-b7a4-fa5c14965293" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	city:vars.city,
+	minimum_temp:payload.main.temp_min as Number - 273.15 as String ++ " celcious",
+	maxmum_temp:payload.main.temp_max as Number - 273.15 as String ++ " celcious"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
