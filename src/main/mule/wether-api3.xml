@@ -21,7 +21,6 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	"q" : vars.city
 }]]]></http:query-params>
 		</http:request>
-		<logger level="INFO" doc:name="Logger" doc:id="30e72679-4fa9-4eb6-8df9-99fe8c75ee0e" message=";;;;request after loger;;;;#[payload]"/>
 		<ee:transform doc:name="Transform Message" doc:id="ecb383d8-d251-43e7-b7a4-fa5c14965293" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -34,5 +33,6 @@ output application/json
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="daa2e857-0474-4da9-9e84-3655c2674541" message=";;;;;;;;after tranform logger;;;;;;;;;;"/>
 	</flow>
 </mule>
